@@ -1,0 +1,18 @@
+{
+  "name": "汉字笔顺 · 临摹本生成器",
+  "short_name": "汉字笔顺",
+  "description": "汉字逐笔笔顺动画与可打印临摹本（田字格/米字格/描红）",
+  "start_url": ".",
+  "display": "standalone",
+  "lang": "zh-CN",
+  "background_color": "#f4f1ec",
+  "theme_color": "#c0392b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

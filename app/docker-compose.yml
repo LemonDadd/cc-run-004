@@ -1,0 +1,8 @@
+services:
+  web:
+    build: .
+    image: hanzi-stroke-app:latest
+    container_name: hanzi-stroke-app
+    ports:
+      - "8080:80"
+    restart: unless-stopped

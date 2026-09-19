@@ -1,0 +1,17 @@
+{
+  "name": "tools",
+  "version": "1.0.0",
+  "main": "build.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "jsdom": "^29.1.1",
+    "playwright-core": "^1.63.0"
+  }
+}

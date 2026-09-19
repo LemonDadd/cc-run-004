@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#c0392b">
+<title>汉字笔顺 · 临摹本生成器</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">字</span>
+    <div>
+      <h1>汉字笔顺 · 临摹本</h1>
+      <small id="dataStatus">正在加载字库…</small>
+    </div>
+  </div>
+  <nav class="tabs" id="tabs">
+    <button data-tab="animate" class="active">笔顺动画</button>
+    <button data-tab="templates">字帖模板</button>
+    <button data-tab="copybook">临摹本</button>
+    <button data-tab="mine">我的字帖</button>
+    <button data-tab="settings">设置</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ 笔顺动画 ============ -->
+  <section id="tab-animate" class="tab-panel active">
+    <div class="anim-layout">
+      <div class="anim-stage card">
+        <div class="stage-toolbar">
+          <input id="charInput" class="char-input" type="text" maxlength="8" value="永"
+                 autocomplete="off" spellcheck="false" placeholder="输入汉字（可多个）">
+          <button id="loadChar" class="btn primary">显示</button>
+          <div class="char-nav">
+            <button id="prevChar" class="btn icon" title="上一个字">‹</button>
+            <span id="charPos">1/1</span>
+            <button id="nextChar" class="btn icon" title="下一个字">›</button>
+          </div>
+          <span class="spacer"></span>
+          <span id="charPinyin" class="pinyin-badge"></span>
+          <button id="favBtn" class="btn ghost" title="收藏当前字">☆ 收藏</button>
+        </div>
+
+        <div class="stage-wrap">
+          <div class="grid-backdrop" id="gridBackdrop"></div>
+          <div id="animStage" class="anim-stage-svg"></div>
+          <div id="stageHint" class="stage-hint hidden"></div>
+        </div>
+
+        <div class="player-controls">
+          <button id="btnRestart" class="btn" title="从头播放">⏮</button>
+          <button id="btnStepBack" class="btn" title="上一笔">−笔</button>
+          <button id="btnPlay" class="btn primary big">▶ 播放</button>
+          <button id="btnStep" class="btn" title="下一笔">笔＋</button>
+          <button id="btnLoop" class="btn ghost" title="循环">🔁 循环</button>
+          <div class="speed-ctl">
+            <label>笔速</label>
+            <input id="speedRange" type="range" min="0.25" max="3" step="0.25" value="1">
+            <span id="speedVal">1×</span>
+          </div>
+        </div>
+        <div class="progress-row">
+          <input id="progressRange" type="range" min="0" max="1" step="0.01" value="0">
+          <span id="progressLabel">0 / 0 笔</span>
+        </div>
+      </div>
+
+      <aside class="side card">
+        <h3>笔画拆解 <small id="strokeCount"></small></h3>
+        <ol id="strokeList" class="stroke-list"></ol>
+        <h3 style="margin-top:18px">显示</h3>
+        <label class="switch-row"><input type="checkbox" id="optOutline" checked> 字形底影</label>
+        <label class="switch-row">底影浓度
+          <input type="range" id="optOutlineOpacity" min="0" max="0.6" step="0.02" value="0.16">
+        </label>
+        <label class="switch-row"><input type="checkbox" id="optMedian"> 显示笔锋轨迹</label>
+        <h3 style="margin-top:18px">导出单字</h3>
+        <div class="btn-row">
+          <button id="exportCharPng" class="btn">PNG</button>
+          <button id="sendToCopybook" class="btn">送去临摹本 →</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ 字帖模板 ============ -->
+  <section id="tab-templates" class="tab-panel">
+    <div class="card">
+      <h2>经典字帖模板</h2>
+      <p class="muted" id="tplListDesc">选择启蒙经典或常用字表，可预览、生成临摹本或收藏。</p>
+      <div id="templateGrid" class="template-grid"></div>
+    </div>
+    <div class="card" id="templateDetailCard" hidden>
+      <div class="detail-head">
+        <h2 id="tplTitle"></h2>
+        <span id="tplDesc" class="muted"></span>
+        <span class="spacer"></span>
+        <button id="tplFav" class="btn ghost">☆ 收藏此帖</button>
+      </div>
+      <div class="range-row">
+        <label>从</label><input id="tplStart" type="number" min="1" value="1">
+        <label>到</label><input id="tplEnd" type="number" value="100">
+        <label class="muted" id="tplTotal"></label>
+        <span class="spacer"></span>
+        <button id="tplAnimPreview" class="btn">笔顺预览</button>
+        <button id="tplGenCopy" class="btn primary">生成临摹本</button>
+      </div>
+      <div id="tplChars" class="char-cloud"></div>
+    </div>
+    <div class="card">
+      <h2>自定义文本</h2>
+      <p class="muted">粘贴任意汉字文本（诗、词、课文），标点自动忽略，按原文顺序排列。</p>
+      <textarea id="customText" rows="3" placeholder="例如：床前明月光，疑是地上霜。"></textarea>
+      <div class="btn-row">
+        <button id="customDedup" class="btn">按字表（去重）生成</button>
+        <button id="customSeq" class="btn primary">按原文顺序生成临摹本</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 临摹本 ============ -->
+  <section id="tab-copybook" class="tab-panel">
+    <div class="copy-layout">
+      <div class="card copy-controls">
+        <h2>临摹本设置</h2>
+        <label>内容（汉字）<textarea id="cbText" rows="3">永字八法</textarea></label>
+        <div class="form-row">
+          <div>
+            <label>当前字数</label>
+            <div id="cbCharCount" class="stat">0</div>
+          </div>
+        </div>
+
+        <h3>格子类型（练习格）</h3>
+        <div class="seg" id="gridTypeSeg">
+          <button data-v="tian" class="active">田字格</button>
+          <button data-v="mi">米字格</button>
+          <button data-v="blank">空白格</button>
+        </div>
+
+        <h3>描红格</h3>
+        <label class="switch-row"><input type="checkbox" id="cbTrace" checked> 首格描红</label>
+        <div class="seg" id="traceGridSeg">
+          <button data-v="tian" class="active">田字格底</button>
+          <button data-v="mi">米字格底</button>
+          <button data-v="trace">无格描红</button>
+        </div>
+        <label class="switch-row">描红浓度
+          <input type="range" id="cbTraceOpacity" min="0.05" max="0.8" step="0.01" value="0.28">
+          <span id="cbTraceOpacityVal">28%</span>
+        </label>
+
+        <h3>排布</h3>
+        <label class="form-row-inline">每字练习格数
+          <input type="number" id="cbBlanks" min="0" max="20" value="2">
+        </label>
+        <label class="switch-row"><input type="checkbox" id="cbKeepOrder"> 按原文顺序（保留重复字）</label>
+        <label class="form-row-inline">格边长
+          <select id="cbCellSize">
+            <option value="84">小 (84px)</option>
+            <option value="112" selected>中 (112px)</option>
+            <option value="140">大 (140px)</option>
+          </select>
+        </label>
+        <label class="switch-row"><input type="checkbox" id="cbPinyin"> 描红格标注拼音</label>
+
+        <label class="form-row-inline">字帖标题
+          <input type="text" id="cbTitle" placeholder="可选">
+        </label>
+
+        <div class="gen-row">
+          <button id="cbGenerate" class="btn primary big">生成预览</button>
+          <span id="cbPerf" class="muted"></span>
+        </div>
+        <h3>导出 / 打印（A4）</h3>
+        <div class="btn-row wrap">
+          <button id="cbPrint" class="btn">🖨 打印 / 存PDF</button>
+          <button id="cbPdf" class="btn primary">下载 PDF</button>
+          <button id="cbPng" class="btn">导出 PNG</button>
+          <button id="cbSave" class="btn ghost">💾 存为我的字帖</button>
+        </div>
+        <div id="cbProgress" class="muted"></div>
+      </div>
+      <div class="card copy-preview">
+        <h2>预览</h2>
+        <div id="sheetPreview" class="sheet-preview">
+          <div class="preview-empty">点击「生成预览」</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 我的字帖 ============ -->
+  <section id="tab-mine" class="tab-panel">
+    <div class="card">
+      <h2>收藏的单字</h2>
+      <div id="favChars" class="char-cloud"></div>
+    </div>
+    <div class="card">
+      <h2>收藏的字帖</h2>
+      <div id="favCopybooks" class="copybook-list"></div>
+    </div>
+  </section>
+
+  <!-- ============ 设置 ============ -->
+  <section id="tab-settings" class="tab-panel">
+    <div class="card settings-grid">
+      <div>
+        <h2>数据与离线</h2>
+        <p class="muted">字库分片按需加载并由浏览器缓存。预下载全部数据后可完全离线使用。</p>
+        <div class="btn-row">
+          <button id="btnPreload" class="btn primary">预下载全部字库（约 29MB）</button>
+          <button id="btnOfflineStatus" class="btn">检查离线状态</button>
+        </div>
+        <div id="preloadBar" class="bar" hidden><div id="preloadBarFill"></div></div>
+        <p id="preloadMsg" class="muted"></p>
+      </div>
+      <div>
+        <h2>备份 / 迁移</h2>
+        <p class="muted">所有字帖、收藏、设置均存于本机浏览器 IndexedDB，不上传服务器。可导出 JSON 备份或在其它设备导入。</p>
+        <div class="btn-row">
+          <button id="btnExportJson" class="btn">导出 JSON</button>
+          <button id="btnImportJson" class="btn">导入 JSON</button>
+          <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
+        <h3 style="margin-top:20px">重置</h3>
+        <div class="btn-row">
+          <button id="btnReset" class="btn danger">清空所有本地数据</button>
+        </div>
+      </div>
+      <div>
+        <h2>关于字库</h2>
+        <ul class="about-list" id="aboutList"></ul>
+        <p class="muted">笔顺数据来自 <a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a>（LGPL/APL 协议）；启蒙文本来自 chinese-poetry 开源项目。</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="js/data.js"></script>
+<script src="js/db.js"></script>
+<script src="js/animator.js"></script>
+<script src="js/sheet.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
