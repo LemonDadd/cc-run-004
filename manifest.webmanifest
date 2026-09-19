@@ -1,0 +1,11 @@
+{
+  "name": "汉字笔顺临摹本",
+  "short_name": "汉字临摹",
+  "description": "汉字逐笔笔顺动画与田字格/米字格临摹本生成，离线可用",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#c0392b",
+  "lang": "zh-CN",
+  "icons": []
+}

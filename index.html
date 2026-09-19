@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>汉字笔顺 · 临摹本</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">字</span>
+    <div>
+      <h1>汉字笔顺 · 临摹本</h1>
+      <small>逐笔动画 · 田字格 / 米字格 / 描红 · A4 导出 PDF</small>
+    </div>
+  </div>
+  <nav class="tabs">
+    <button class="tab active" data-view="animate">笔顺动画</button>
+    <button class="tab" data-view="workbook">生成临摹本</button>
+    <button class="tab" data-view="collections">我的字帖</button>
+  </nav>
+</header>
+
+<main>
+  <!-- ============ 笔顺动画 ============ -->
+  <section id="view-animate" class="view active">
+    <div class="panel input-panel">
+      <div class="input-row">
+        <input id="charInput" type="text" maxlength="20" placeholder="输入一个或多个汉字，如：永字八法" autocomplete="off">
+        <button id="btnPlay" class="primary">播放</button>
+      </div>
+      <div class="template-row">
+        <span class="muted">字帖模板：</span>
+        <button class="chip" data-tpl="qianziwen">《千字文》</button>
+        <button class="chip" data-tpl="sanzijing">《三字经》</button>
+        <span class="muted" id="tplHint"></span>
+      </div>
+      <div id="charStrip" class="char-strip"></div>
+    </div>
+
+    <div class="panel stage-panel">
+      <div class="stage-wrap">
+        <svg id="stage" viewBox="0 0 1024 1024" preserveAspectRatio="xMidYMid meet">
+          <g id="stageGrid"></g>
+          <g id="stageOutline"></g>
+          <g id="stageStrokes"></g>
+          <g id="stageMark"></g>
+        </svg>
+      </div>
+
+      <div class="stage-side">
+        <div class="big-char-meta">
+          <div class="cur-char" id="curChar">永</div>
+          <div class="stroke-count">共 <b id="strokeCount">0</b> 笔</div>
+          <div id="strokeLegend" class="legend"></div>
+        </div>
+
+        <div class="controls">
+          <div class="btn-row">
+            <button id="btnPrev" title="上一笔">⏮ 上一笔</button>
+            <button id="btnPause">⏸ 暂停</button>
+            <button id="btnNext" title="下一笔">下一笔 ⏭</button>
+          </div>
+          <label class="ctl">
+            <input type="checkbox" id="chkLoop"> 循环播放
+          </label>
+          <label class="ctl speed">
+            笔速
+            <input type="range" id="speedRange" min="0.25" max="3" step="0.25" value="1">
+            <span id="speedVal">1×</span>
+          </label>
+          <label class="ctl">
+            <input type="checkbox" id="chkOutline" checked> 显示淡灰底字
+          </label>
+          <label class="ctl">
+            <input type="checkbox" id="chkGrid" checked> 显示米字格
+          </label>
+        </div>
+
+        <div class="batch-note muted">
+          数据来自本地内置笔顺库（约 9600 字，含每笔起止坐标）。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 生成临摹本 ============ -->
+  <section id="view-workbook" class="view">
+    <div class="panel wb-controls">
+      <div class="wb-field">
+        <label>内容</label>
+        <textarea id="wbText" rows="3" placeholder="输入要生成字帖的汉字，或从右侧选模板"></textarea>
+        <div class="wb-tpl">
+          <button class="chip" data-wbtpl="qianziwen">《千字文》全文</button>
+          <button class="chip" data-wbtpl="sanzijing">《三字经》全文</button>
+          <span id="wbCount" class="muted"></span>
+        </div>
+      </div>
+
+      <div class="wb-field opts">
+        <div class="opt-group">
+          <label>格子类型</label>
+          <select id="optGrid">
+            <option value="mi">米字格</option>
+            <option value="tian" selected>田字格</option>
+            <option value="jiugong">九宫格</option>
+            <option value="blank">空白格</option>
+          </select>
+        </div>
+        <div class="opt-group">
+          <label>排版模式</label>
+          <select id="optMode">
+            <option value="demo" selected>示范 + 描红 + 空格</option>
+            <option value="trace">全部描红</option>
+            <option value="blank">全部空格</option>
+          </select>
+        </div>
+        <div class="opt-group" id="grpTrace">
+          <label>每字描红格数 <b id="traceCountVal">2</b></label>
+          <input type="range" id="optTraceCount" min="0" max="6" value="2">
+        </div>
+        <div class="opt-group" id="grpBlank">
+          <label>每字空格数 <b id="blankCountVal">2</b></label>
+          <input type="range" id="optBlankCount" min="0" max="8" value="2">
+        </div>
+        <div class="opt-group" id="grpOpacity">
+          <label>描红浓度 <b id="opacityVal">28%</b></label>
+          <input type="range" id="optOpacity" min="5" max="70" value="28">
+        </div>
+        <div class="opt-group">
+          <label>每页列 × 行</label>
+          <div class="inline">
+            <select id="optCols">
+              <option>8</option><option selected>10</option><option>12</option>
+            </select>
+            ×
+            <select id="optRows">
+              <option>10</option><option selected>12</option><option>14</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="wb-actions">
+        <button id="btnGenerate" class="primary">生成预览</button>
+        <button id="btnPrint">🖨 打印 / 存PDF</button>
+        <button id="btnExportPdf">导出 PDF</button>
+        <button id="btnExportPng">导出 PNG</button>
+        <button id="btnSaveCollection">⭐ 存入字帖</button>
+        <span id="genStatus" class="muted"></span>
+      </div>
+    </div>
+
+    <div class="panel preview-panel">
+      <div id="pagePreview" class="page-preview"></div>
+      <div class="pager" id="pager" hidden>
+        <button id="pgPrev">上一页</button>
+        <span id="pgInfo">1 / 1</span>
+        <button id="pgNext">下一页</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 我的字帖 ============ -->
+  <section id="view-collections" class="view">
+    <div class="panel">
+      <div class="coll-head">
+        <h2>本地收藏的字帖</h2>
+        <div>
+          <button id="btnExportData">导出数据 JSON</button>
+          <button id="btnImportData">导入 JSON</button>
+          <input type="file" id="importFile" accept="application/json" hidden>
+        </div>
+      </div>
+      <p class="muted">字帖、收藏与设置都保存在本浏览器 IndexedDB 中，不上传服务器。可导出 JSON 备份或迁移。</p>
+      <div id="collectionList" class="collection-list"></div>
+    </div>
+  </section>
+</main>
+
+<!-- 打印用容器（仅打印时可见） -->
+<div id="printRoot"></div>
+<div id="toast"></div>
+
+<script src="vendor/jspdf.umd.min.js"></script>
+<script type="module" src="src/app.js"></script>
+</body>
+</html>

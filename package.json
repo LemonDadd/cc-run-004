@@ -1,0 +1,12 @@
+{
+  "name": "hanzi-xingben",
+  "version": "1.0.0",
+  "description": "汉字笔顺动画与临摹本生成（本地内置约 9600 字笔顺数据，离线可用）",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "build:data": "python3 scripts/build_data.py node_modules/hanzi-writer-data data/strokes.json"
+  },
+  "license": "MIT",
+  "private": true
+}

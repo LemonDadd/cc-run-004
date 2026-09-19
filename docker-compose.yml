@@ -1,0 +1,8 @@
+services:
+  hanzi-workbook:
+    build: .
+    image: hanzi-xingben:latest
+    container_name: hanzi-xingben
+    ports:
+      - "8080:80"
+    restart: unless-stopped
